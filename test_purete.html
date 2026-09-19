@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>★ Le Test de Pureté ★</title>
+<style>
+/* No external fonts - works offline and in WhatsApp browser */
+:root {
+  --neon-pink: #ff00ff;
+  --neon-green: #39ff14;
+  --neon-blue: #00f0ff;
+  --neon-yellow: #ffff00;
+  --hot-red: #ff3333;
+  --bg-dark: #1a0033;
+  --bg-card: #2a0055;
+  --text-light: #f0e0ff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', system-ui, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-light);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.stars {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+}
+.star {
+  position: absolute; background: #fff; border-radius: 50%;
+  animation: twinkle 2s infinite alternate;
+}
+@keyframes twinkle { 0% { opacity: 0.2; } 100% { opacity: 1; } }
+
+.container {
+  position: relative; z-index: 1;
+  max-width: 700px; margin: 0 auto; padding: 20px;
+}
+
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.title-box {
+  text-align: center; padding: 30px 20px;
+  border: 3px solid var(--neon-pink);
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1a0033, #330066, #1a0033);
+  box-shadow: 0 0 20px rgba(255,0,255,0.3), inset 0 0 20px rgba(255,0,255,0.1);
+  margin-bottom: 24px;
+}
+.title-box h1 {
+  font-family: 'Courier New', 'Courier', monospace; font-weight: 900;
+  font-size: clamp(16px, 4vw, 28px);
+  color: var(--neon-pink);
+  text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+.title-box .subtitle {
+  font-size: 14px; color: var(--neon-green);
+  text-shadow: 0 0 5px var(--neon-green);
+}
+.title-box .credits {
+  font-size: 11px; color: #8866aa; margin-top: 12px;
+  font-style: italic; line-height: 1.6;
+}
+
+.warning-box {
+  border: 2px dashed var(--hot-red);
+  background: rgba(255,0,0,0.08);
+  padding: 20px; border-radius: 6px; margin-bottom: 20px;
+  text-align: center;
+}
+.warning-box h2 {
+  color: var(--hot-red); font-size: 20px; margin-bottom: 10px;
+  text-shadow: 0 0 8px rgba(255,0,0,0.5);
+}
+.warning-box p { font-size: 15px; line-height: 1.6; margin-bottom: 8px; }
+
+.info-box {
+  background: rgba(0,240,255,0.08); border: 1px solid var(--neon-blue);
+  border-radius: 6px; padding: 16px; margin-bottom: 20px;
+  text-align: center; font-size: 14px;
+}
+.info-box span { color: var(--neon-blue); font-weight: 700; }
+
+/* Name input */
+.name-input-area {
+  text-align: center; margin-bottom: 20px;
+}
+.name-input-area label {
+  display: block; font-size: 16px; color: var(--neon-yellow);
+  margin-bottom: 10px; font-weight: 700;
+}
+.name-input {
+  font-family: 'Comic Sans MS', 'Chalkboard SE', system-ui, sans-serif; font-size: 20px; font-weight: 700;
+  padding: 12px 20px; border-radius: 6px;
+  border: 2px solid var(--neon-pink);
+  background: rgba(255,0,255,0.08); color: var(--neon-pink);
+  text-align: center; width: 80%; max-width: 300px;
+  outline: none;
+}
+.name-input::placeholder { color: rgba(255,0,255,0.3); }
+.name-input:focus { border-color: var(--neon-green); box-shadow: 0 0 12px rgba(57,255,20,0.3); }
+
+.btn {
+  display: inline-block; padding: 14px 36px; margin: 8px;
+  font-family: 'Courier New', 'Courier', monospace; font-weight: 900; font-size: 12px;
+  border: none; border-radius: 4px; cursor: pointer;
+  text-transform: uppercase; transition: all 0.15s;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.4);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  -webkit-appearance: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.4); }
+.btn-start {
+  background: var(--neon-green); color: #000;
+  box-shadow: 0 4px 0 #1a8a00, 0 0 15px rgba(57,255,20,0.4);
+}
+.btn-start:hover { background: #50ff30; }
+.btn-yes {
+  background: var(--neon-green); color: #000;
+  box-shadow: 0 4px 0 #1a8a00, 0 0 10px rgba(57,255,20,0.3);
+  min-width: 120px;
+}
+.btn-yes:hover { background: #50ff30; }
+.btn-no {
+  background: var(--hot-red); color: #fff;
+  box-shadow: 0 4px 0 #990000, 0 0 10px rgba(255,0,0,0.3);
+  min-width: 120px;
+}
+.btn-no:hover { background: #ff5555; }
+
+/* Question card: fixed layout so buttons stay in place */
+.question-card {
+  background: var(--bg-card);
+  border: 2px solid var(--neon-pink);
+  border-radius: 8px; padding: 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 15px rgba(255,0,255,0.15);
+  display: flex; flex-direction: column;
+  min-height: 320px;
+}
+.q-top { flex: 1; }
+.q-bottom {
+  flex-shrink: 0; padding-top: 16px;
+  border-top: 1px solid rgba(255,0,255,0.15);
+  margin-top: 12px;
+}
+.q-number {
+  font-family: 'Courier New', 'Courier', monospace; font-weight: 900;
+  font-size: 11px; color: var(--neon-blue);
+  text-shadow: 0 0 5px var(--neon-blue);
+  margin-bottom: 8px;
+}
+.q-category {
+  display: inline-block; padding: 2px 8px; border-radius: 3px;
+  font-size: 10px; font-weight: 700; margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.cat-alcool { background: rgba(255,165,0,0.2); color: #ffaa33; border: 1px solid #ffaa33; }
+.cat-drogue { background: rgba(0,255,0,0.1); color: var(--neon-green); border: 1px solid var(--neon-green); }
+.cat-sexe { background: rgba(255,0,255,0.15); color: var(--neon-pink); border: 1px solid var(--neon-pink); }
+.cat-divers { background: rgba(0,240,255,0.1); color: var(--neon-blue); border: 1px solid var(--neon-blue); }
+
+.q-text {
+  font-size: 18px; line-height: 1.5;
+  font-weight: 700;
+}
+.q-bonus {
+  font-size: 14px; color: var(--neon-yellow);
+  font-style: italic; margin-top: 8px;
+}
+.q-buttons { text-align: center; }
+
+.progress-bar {
+  width: 100%; height: 6px; background: rgba(255,255,255,0.1);
+  border-radius: 3px; margin-bottom: 20px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+  border-radius: 3px; transition: width 0.3s ease;
+  box-shadow: 0 0 8px rgba(255,0,255,0.5);
+}
+
+.number-input-box {
+  display: none; text-align: center; margin-top: 12px;
+  padding: 16px; background: rgba(255,255,0,0.05);
+  border: 1px solid var(--neon-yellow); border-radius: 6px;
+}
+.number-input-box label {
+  display: block; font-size: 14px; color: var(--neon-yellow); margin-bottom: 12px;
+}
+.number-btns { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.number-btns .btn {
+  padding: 10px 20px; font-size: 14px; min-width: 50px;
+  background: var(--neon-yellow); color: #000;
+  box-shadow: 0 3px 0 #aa8800;
+  font-family: 'Courier New', 'Courier', monospace; font-weight: 900;
+}
+.number-btns .btn:hover { background: #ffff55; }
+
+/* Results page */
+.results-card {
+  background: var(--bg-card); border: 3px solid var(--neon-pink);
+  border-radius: 10px; padding: 30px;
+  box-shadow: 0 0 30px rgba(255,0,255,0.2);
+  margin-bottom: 24px;
+}
+.score-display { text-align: center; margin-bottom: 24px; }
+.score-label { font-size: 14px; color: var(--neon-blue); margin-bottom: 8px; }
+.score-value {
+  font-family: 'Courier New', 'Courier', monospace; font-weight: 900;
+  font-size: clamp(36px, 10vw, 72px);
+  color: var(--neon-pink);
+  text-shadow: 0 0 20px var(--neon-pink), 0 0 40px var(--neon-pink);
+}
+.score-max { font-size: 14px; color: #8866aa; }
+.score-title {
+  font-family: 'Courier New', 'Courier', monospace; font-weight: 900;
+  font-size: clamp(11px, 3vw, 16px);
+  color: var(--neon-green);
+  text-shadow: 0 0 10px var(--neon-green);
+  margin: 16px 0; text-align: center; line-height: 1.8;
+}
+.score-comment {
+  font-size: 16px; line-height: 1.7;
+  text-align: center; padding: 16px;
+  background: rgba(255,0,255,0.05);
+  border: 1px solid rgba(255,0,255,0.2);
+  border-radius: 6px; margin-bottom: 24px;
+}
+
+.cat-chart { margin-bottom: 24px; }
+.cat-chart h3 {
+  font-size: 14px; color: var(--neon-blue); margin-bottom: 16px;
+  text-align: center; text-transform: uppercase; letter-spacing: 2px;
+}
+.cat-bar-row { display: flex; align-items: center; margin-bottom: 10px; gap: 10px; }
+.cat-bar-label { width: 80px; text-align: right; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.cat-bar-track { flex: 1; height: 22px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+.cat-bar-fill {
+  height: 100%; border-radius: 4px; transition: width 1s ease;
+  display: flex; align-items: center; justify-content: flex-end;
+  padding-right: 6px; font-size: 10px; font-weight: 700; color: #000; min-width: 30px;
+}
+.cat-bar-fill.alcool { background: linear-gradient(90deg, #ff8800, #ffaa33); }
+.cat-bar-fill.drogue { background: linear-gradient(90deg, #00aa00, var(--neon-green)); }
+.cat-bar-fill.sexe { background: linear-gradient(90deg, #cc00cc, var(--neon-pink)); }
+.cat-bar-fill.divers { background: linear-gradient(90deg, #0088cc, var(--neon-blue)); }
+
+.screenshot-tip {
+  text-align: center; padding: 16px;
+  border: 2px dashed var(--neon-yellow);
+  border-radius: 6px; margin-top: 20px; font-size: 14px;
+}
+.screenshot-tip .emoji { font-size: 24px; margin-bottom: 8px; display: block; }
+.screenshot-tip .tip-text { color: var(--neon-yellow); }
+.screenshot-tip .tip-target { color: #fff; font-weight: 700; margin-top: 4px; }
+
+.btn-restart {
+  display: block; margin: 20px auto;
+  background: var(--neon-blue); color: #000;
+  box-shadow: 0 4px 0 #006688;
+}
+.btn-restart:hover { background: #33ffff; }
+
+.marquee {
+  overflow: hidden; white-space: nowrap;
+  font-family: 'Courier New', 'Courier', monospace; font-weight: 900;
+  font-size: 10px; color: var(--neon-yellow);
+  padding: 8px 0; margin-bottom: 16px;
+}
+.marquee span { display: inline-block; animation: scroll 20s linear infinite; }
+@keyframes scroll { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
+
+.footer-credits {
+  text-align: center; margin-top: 16px; font-size: 11px; color: #665588; line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .container { padding: 10px; }
+  body { font-size: 17px; }
+  .title-box h1 { font-size: 18px; }
+  .title-box .subtitle { font-size: 16px; }
+  .title-box .credits { font-size: 13px; }
+  .warning-box h2 { font-size: 22px; }
+  .warning-box p { font-size: 17px; }
+  .info-box { font-size: 16px; }
+  .question-card { padding: 18px; min-height: 300px; }
+  .q-number { font-size: 12px; }
+  .q-category { font-size: 11px; }
+  .q-text { font-size: 19px; }
+  .q-bonus { font-size: 16px; }
+  .btn { padding: 16px 32px; font-size: 13px; min-height: 52px; }
+  .btn-yes, .btn-no { min-width: 130px; }
+  .number-btns .btn { padding: 14px 22px; font-size: 16px; min-width: 54px; }
+  .number-input-box label { font-size: 16px; }
+  .name-input { font-size: 22px; padding: 14px 20px; width: 90%; }
+  .name-input-area label { font-size: 18px; }
+  .score-comment { font-size: 17px; }
+  .cat-bar-label { font-size: 13px; }
+  .screenshot-tip { font-size: 16px; }
+  .screenshot-tip .tip-target { font-size: 17px; }
+  .footer-credits { font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="container">
+
+  <!-- PAGE INTRO -->
+  <div class="page active" id="page-intro">
+    <div class="title-box">
+      <h1>★ LE TEST DE<br>PURETÉ ★</h1>
+      <div class="subtitle">Êtes-vous un saint ou un déchet ?</div>
+      <div class="credits">
+        Traduit et adapté par Stéph From Outer Space — 1997<br>
+        Recodé avec amour en 2026 par Nicnock34<br>et une longue conversation avec Claude Opus 4.7…<br>avant qu'il ne devienne Skynet 1.0.
+      </div>
+    </div>
+
+    <div class="warning-box">
+      <h2>⚠ ATTENTION ⚠</h2>
+      <p>Ce test consiste en <strong>90 questions</strong> (à peu près) portant, pour la plupart, sur les thèmes de l'alcool, du sexe et de la drogue.</p>
+      <p>Certaines de ces questions pourraient choquer les personnes les plus sensibles.</p>
+      <p>Si tel est votre cas, <strong>fermez cette page</strong> immédiatement…</p>
+    </div>
+
+    <div class="info-box">
+      📋 <span>90 questions</span> + quelques bonus<br>
+      ⏱ Durée estimée : <span>5 à 10 minutes</span><br>
+      🎯 Cliquez sur <span>OUI</span> ou <span>NON</span> pour chaque question
+    </div>
+
+    <div class="name-input-area">
+      <label for="player-name">✏️ Entre ton prénom pour commencer :</label>
+      <input type="text" id="player-name" class="name-input" placeholder="Ton prénom" maxlength="20" autocomplete="given-name"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();startQuiz();}"
+        oninput="document.getElementById('name-error').style.display='none'">
+      <div id="name-error" style="display:none;color:var(--hot-red);font-size:14px;margin-top:8px;font-weight:700;">
+        ⛔ Entre ton prénom d'abord !
+      </div>
+    </div>
+
+    <div style="text-align:center;">
+      <button type="button" class="btn btn-start" id="btn-start" onclick="startQuiz()">▶ COMMENCER LE TEST</button>
+    </div>
+
+    <noscript>
+      <div style="text-align:center;padding:20px;color:#ff3333;font-size:18px;border:2px solid #ff3333;border-radius:8px;margin:16px 0;">
+        ⚠️ JavaScript est désactivé dans ce navigateur.<br>
+        Ouvre ce fichier dans Safari ou Chrome pour que le test fonctionne.
+      </div>
+    </noscript>
+
+    <div class="marquee"><span>★ ★ ★  Mad Dog Productions — The voice of the immoral minority  ★ ★ ★  Ce test a été conçu pour les esprits ouverts et les âmes perdues  ★ ★ ★</span></div>
+  </div>
+
+  <!-- PAGE QUESTION -->
+  <div class="page" id="page-question">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="question-card">
+      <div class="q-top">
+        <div class="q-number" id="q-number"></div>
+        <div id="q-cat-badge"></div>
+        <div class="q-text" id="q-text"></div>
+        <div id="q-bonus-area"></div>
+      </div>
+      <div class="q-bottom">
+        <div class="q-buttons" id="q-buttons">
+          <button class="btn btn-yes" onclick="answer(true)">OUI</button>
+          <button class="btn btn-no" onclick="answer(false)">NON</button>
+        </div>
+        <div class="number-input-box" id="number-input-box">
+          <label id="number-label"></label>
+          <div class="number-btns" id="number-btns"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE RESULTS -->
+  <div class="page" id="page-results">
+    <div class="results-card">
+      <div class="score-display">
+        <div class="score-label" id="score-label">Votre score au Test de Pureté</div>
+        <div class="score-value" id="score-value">0</div>
+        <div class="score-max">sur ~450 possibles</div>
+      </div>
+      <div class="score-title" id="score-title"></div>
+      <div class="score-comment" id="score-comment"></div>
+
+      <div class="cat-chart">
+        <h3>📊 Répartition par catégorie</h3>
+        <div class="cat-bar-row">
+          <div class="cat-bar-label" style="color:#ffaa33">🍺 Alcool</div>
+          <div class="cat-bar-track"><div class="cat-bar-fill alcool" id="bar-alcool"></div></div>
+        </div>
+        <div class="cat-bar-row">
+          <div class="cat-bar-label" style="color:#39ff14">🌿 Drogue</div>
+          <div class="cat-bar-track"><div class="cat-bar-fill drogue" id="bar-drogue"></div></div>
+        </div>
+        <div class="cat-bar-row">
+          <div class="cat-bar-label" style="color:#ff00ff">💋 Sexe</div>
+          <div class="cat-bar-track"><div class="cat-bar-fill sexe" id="bar-sexe"></div></div>
+        </div>
+        <div class="cat-bar-row">
+          <div class="cat-bar-label" style="color:#00f0ff">🎲 Divers</div>
+          <div class="cat-bar-track"><div class="cat-bar-fill divers" id="bar-divers"></div></div>
+        </div>
+      </div>
+
+      <div class="screenshot-tip" id="screenshot-tip"></div>
+    </div>
+
+    <button class="btn btn-restart" onclick="location.reload()">🔄 RECOMMENCER</button>
+
+    <div class="footer-credits">
+      The PURITY Test — Mad Dog Productions 1997<br>
+      Traduit par Stéph From Outer Space<br>
+      Recodé en 2026 par Nicnock34 & Claude Opus 4.7<br>
+      …avant qu'il ne devienne Skynet 1.0
+    </div>
+  </div>
+
+</div>
+
+<script>
+const Q = [
+{n:1, t:"Avez-vous déjà ri du malheur de quelqu'un ?", p:1, op:'+', c:'divers'},
+{n:2, t:"Avez-vous déjà ri d'une personne mentalement ou physiquement handicapée ?", p:2, op:'+', c:'divers'},
+{n:3, t:"Avez-vous déjà goûté à l'alcool ?", p:1, op:'+', c:'alcool'},
+{n:4, t:"Avez-vous déjà été ivre ?", p:2, op:'+', c:'alcool'},
+{n:5, t:"Avez-vous déjà participé à des jeux à boire ?", p:2, op:'+', c:'alcool'},
+{n:6, t:"Êtes-vous déjà tombé(e) parce que vous étiez trop ivre ?", p:3, op:'+', c:'alcool'},
+{n:7, t:"Avez-vous déjà bu assez pour vomir ?", p:4, op:'+', c:'alcool',
+  bonus:{t:"Bonus : Sur vous ou sur quelqu'un d'autre ?", p:1, op:'+'}},
+{n:8, t:"Vous êtes-vous déjà réveillé(e) sans vous rappeler ce que vous aviez fait la nuit précédente ?", p:5, op:'+', c:'alcool'},
+{n:9, t:"Vous êtes-vous déjà fait sortir d'un bar ou d'une boîte de nuit de force ?", p:8, op:'+', c:'alcool'},
+{n:10, t:"Avez-vous déjà participé à un barathon (tous les bars d'une ville ou d'une rue) ?", p:5, op:'+', c:'alcool'},
+{n:11, t:"Buvez-vous régulièrement (au moins trois fois par semaine) ?", p:3, op:'+', c:'alcool',
+  numInput:{label:"Nombre de jours en plus des trois jours réguliers ?", max:4, mult:1}},
+{n:12, t:"Vous êtes-vous déjà endormi(e) ou évanoui(e) dans un bar ou une boîte ?", p:4, op:'+', c:'alcool'},
+{n:13, t:"Avez-vous déjà essayé les drogues ?", p:0, op:'+', c:'drogue',
+  numInput:{label:"Nombre de drogues essayées ?", max:5, mult:4}},
+{n:14, t:"Consommez-vous des drogues régulièrement ?", p:4, op:'+', c:'drogue',
+  bonus:{t:"Bonus : Plus de 4 fois par semaine ?", p:4, op:'+'}},
+{n:15, t:"Avez-vous déjà acheté de la drogue ?", p:4, op:'+', c:'drogue'},
+{n:16, t:"Avez-vous déjà vendu de la drogue ?", p:8, op:'+', c:'drogue'},
+{n:17, t:"Avez-vous déjà vendu de la drogue pour financer votre propre consommation ?", p:12, op:'+', c:'drogue'},
+{n:18, t:"Avez-vous déjà eu un mauvais trip ?", p:5, op:'+', c:'drogue'},
+{n:19, t:"Avez-vous déjà initié quelqu'un aux drogues en général ?", p:8, op:'+', c:'drogue'},
+{n:20, t:"Avez-vous déjà initié quelqu'un à une nouvelle drogue ?", p:8, op:'+', c:'divers'},
+{n:21, t:"Avez-vous déjà été ivre ou défoncé(e) pendant plus de 48 heures ?", p:8, op:'+', c:'alcool'},
+{n:22, t:"Avez-vous déjà eu un rendez-vous amoureux ?", p:2, op:'+', c:'sexe'},
+{n:23, t:"Avez-vous déjà embrassé et/ou peloté quelqu'un ?", p:2, op:'+', c:'sexe',
+  bonus:{t:"Bonus : Jusqu'à l'orgasme ?", p:2, op:'+'}},
+{n:24, t:"Avez-vous déjà eu des relations sexuelles ?", p:6, op:'+', c:'sexe'},
+{n:25, t:"Avez-vous déjà pris un bain ou une douche avec un(e) partenaire ?", p:5, op:'+', c:'sexe'},
+{n:26, t:"Avez-vous déjà payé pour du sexe ?", p:8, op:'+', c:'divers'},
+{n:27, t:"Avez-vous déjà utilisé un mensonge énorme (fausse identité, fausse profession, faux statut amoureux) pour coucher avec quelqu'un ?", p:4, op:'+', c:'sexe'},
+{n:28, t:"Avez-vous déjà élaboré un plan de drague en plusieurs étapes, digne d'une opération militaire, pour arriver à vos fins ?", p:8, op:'+', c:'sexe'},
+{n:29, t:"Avez-vous déjà été impliqué(e) dans une fellation ou un cunnilingus ?", p:4, op:'+', c:'sexe',
+  bonus:{t:"Bonus : Jusqu'à l'orgasme ?", p:2, op:'+'}},
+{n:30, t:"Avez-vous déjà eu un rapport anal ?", p:6, op:'+', c:'sexe',
+  bonus:{t:"Bonus : Jusqu'à l'orgasme ?", p:2, op:'+'}},
+{n:31, t:"Avez-vous déjà fait un 69 ?", p:4, op:'+', c:'sexe'},
+{n:32, t:"Avez-vous déjà eu une IST (infection sexuellement transmissible) ?", p:12, op:'+', c:'sexe'},
+{n:33, t:"Avez-vous déjà eu des relations sexuelles sans utiliser de moyen de contraception ?", p:4, op:'+', c:'sexe'},
+{n:34, t:"Avez-vous déjà subi ou été à l'origine d'un avortement ?", p:12, op:'+', c:'divers'},
+{n:35, t:"Avez-vous déjà eu des relations sexuelles avec plus d'une personne en même temps ?", p:9, op:'+', c:'sexe'},
+{n:36, t:"Avez-vous déjà eu des relations sexuelles avec plus de deux personnes dans la même semaine ?", p:4, op:'+', c:'sexe'},
+{n:37, t:"Avez-vous déjà eu des relations sexuelles dans un lieu public ?", p:6, op:'+', c:'sexe'},
+{n:38, t:"Avez-vous déjà eu des brûlures de tapis lors d'une relation sexuelle ?", p:4, op:'+', c:'sexe'},
+{n:39, t:"Avez-vous déjà eu des rapports homosexuels ?", p:10, op:'+', c:'sexe'},
+{n:40, t:"Avez-vous déjà eu des expériences sado-masochistes ou pratiqué le bondage ?", p:6, op:'+', c:'sexe'},
+{n:41, t:"Avez-vous déjà utilisé des gadgets sexuels ?", p:6, op:'+', c:'sexe'},
+{n:42, t:"Vous êtes-vous déjà endormi(e) ou évanoui(e) pendant l'acte sexuel ?", p:5, op:'+', c:'sexe'},
+{n:43, t:"Avez-vous déjà été responsable de la perte de la virginité de quelqu'un ?", p:0, op:'+', c:'sexe',
+  numInput:{label:"Nombre de personnes que vous avez dépucelées ?", max:3, mult:2}},
+{n:44, t:"Vous êtes-vous déjà masturbé(e) tout en téléphonant ?", p:3, op:'+', c:'sexe'},
+{n:45, t:"Avez-vous déjà acheté quelque chose dans un sex-shop ?", p:3, op:'+', c:'sexe'},
+{n:46, t:"Avez-vous déjà léché un œil, un orteil ou une oreille ?", p:2, op:'+', c:'divers'},
+{n:47, t:"Avez-vous déjà eu des relations sexuelles avec quelqu'un de votre famille ?", p:7, op:'+', c:'sexe'},
+{n:48, t:"Avez-vous hésité avant de répondre à la question précédente ?", p:2, op:'+', c:'divers'},
+{n:49, t:"Avez-vous déjà dormi dans les toilettes ?", p:3, op:'+', c:'sexe'},
+{n:50, t:"Avez-vous vous-même été volontaire pour dormir à cet endroit ?", p:5, op:'+', c:'sexe'},
+{n:51, t:"Avez-vous déjà été excité(e) par quelque chose qui vous a vous-même choqué(e) ?", p:5, op:'+', c:'sexe'},
+{n:52, t:"Avez-vous déjà été arrêté(e) ?", p:0, op:'+', c:'divers',
+  numInput:{label:"Combien de fois ?", max:3, mult:5},
+  bonus:{t:"Bonus : Et été condamné(e) ?", p:5, op:'+'}},
+{n:53, t:"Avez-vous déjà eu un coup d'une nuit (une histoire d'un soir avec relation sexuelle) ?", p:4, op:'+', c:'sexe',
+  numInput:{label:"Combien de fois ?", max:5, mult:2}},
+{n:54, t:"Avez-vous déjà eu un coup d'une nuit et quitté votre partenaire sans même lui dire au revoir ?", p:3, op:'+', c:'sexe'},
+{n:55, t:"Avez-vous déjà eu des relations sexuelles avec plus d'une personne de la même famille ?", p:8, op:'+', c:'sexe'},
+{n:56, t:"Avez-vous déjà eu des relations sexuelles avec une personne qui était en couple avec quelqu'un d'autre ?", p:4, op:'+', c:'sexe'},
+{n:57, t:"Avez-vous déjà eu des relations sexuelles avec un(e) ami(e) de votre partenaire officiel(le) ?", p:5, op:'+', c:'sexe'},
+{n:58, t:"Avez-vous déjà eu des relations sexuelles avec quelqu'un qui avait deux fois votre âge ?", p:3, op:'+', c:'sexe'},
+{n:59, t:"Avez-vous déjà eu des relations sexuelles pour de l'argent (payé ou payeur) ?", p:6, op:'+', c:'sexe'},
+{n:60, t:"Avez-vous déjà mangé votre vomi ou celui de quelqu'un d'autre ?", p:4, op:'+', c:'alcool'},
+{n:61, t:"Vous êtes-vous déjà masturbé(e) ?", p:2, op:'+', c:'sexe',
+  bonus:{t:"Bonus : Masturbation mutuelle ?", p:2, op:'+'}},
+{n:62, t:"Avez-vous déjà participé à une douche dorée ?", p:6, op:'+', c:'sexe'},
+{n:63, t:"Êtes-vous déjà allé(e) à l'église, au temple, à la synagogue ou à la mosquée en dehors des cérémonies (mariages, communions, enterrements…) ?", p:10, op:'-', c:'divers',
+  bonus:{t:"Bonus : Y allez-vous au moins une fois par semaine ?", p:10, op:'-'}},
+{n:64, t:"Avez-vous déjà fait un rêve érotique ?", p:2, op:'+', c:'sexe'},
+{n:65, t:"Avez-vous déjà été voyeur ?", p:3, op:'+', c:'divers'},
+{n:66, t:"Avez-vous déjà simulé un orgasme ?", p:3, op:'+', c:'sexe'},
+{n:67, t:"Avez-vous déjà posé un lapin à quelqu'un ?", p:2, op:'+', c:'divers'},
+{n:68, t:"Êtes-vous déjà sorti(e) avec quelqu'un juste pour le sexe ?", p:3, op:'+', c:'sexe'},
+{n:69, t:"Avez-vous déjà eu des relations sexuelles sur le pouce (entre deux cours, dans la rue, dans l'urgence, sans préliminaires ou presque) ?", p:2, op:'+', c:'sexe'},
+{n:70, t:"Possédez-vous une bible, un Coran, une Torah ou un autre livre sacré ?", p:5, op:'-', c:'divers'},
+{n:71, t:"Avez-vous déjà travaillé pour une œuvre caritative ?", p:5, op:'-', c:'divers'},
+{n:72, t:"Avez-vous déjà fait des dons d'argent pour des œuvres caritatives ?", p:5, op:'-', c:'divers'},
+{n:73, t:"Vous êtes-vous déjà uriné(e) dessus quand vous étiez ivre ?", p:5, op:'+', c:'alcool'},
+{n:74, t:"Avez-vous déjà eu des relations sexuelles pour gagner un pari ?", p:3, op:'+', c:'sexe'},
+{n:75, t:"Avez-vous déjà eu un petit-déjeuner alcoolique ?", p:3, op:'+', c:'alcool'},
+{n:76, t:"Avez-vous déjà exhibé vos parties génitales en public ?", p:5, op:'+', c:'divers'},
+{n:77, t:"Avez-vous déjà eu des relations sexuelles pour avoir un travail ou une promotion ?", p:2, op:'+', c:'sexe'},
+{n:78, t:"Avez-vous déjà été infidèle ?", p:3, op:'+', c:'sexe'},
+{n:79, t:"Avez-vous déjà eu des relations sexuelles avec le/la partenaire d'un(e) de vos ami(e)s ?", p:5, op:'+', c:'sexe'},
+{n:80, t:"Avez-vous déjà vomi dans un lieu public ?", p:4, op:'+', c:'alcool'},
+{n:81, t:"Vous êtes-vous déjà réveillé(e) en vous demandant où vous étiez ?", p:2, op:'+', c:'alcool'},
+{n:82, t:"Vous êtes-vous déjà réveillé(e) en vous demandant où vous étiez ET qui était la personne à côté de vous ?", p:5, op:'+', c:'alcool'},
+{n:83, t:"Vous êtes-vous déjà posé des questions sur la vie sexuelle des personnages de dessins animés ?", p:3, op:'+', c:'sexe'},
+{n:84, t:"Avez-vous un tatouage ?", p:5, op:'+', c:'divers'},
+{n:85, t:"Avez-vous déjà uriné ailleurs que dans un endroit prévu à cet usage ?", p:3, op:'+', c:'alcool'},
+{n:86, t:"Avez-vous déjà eu des relations sexuelles que vous regrettez maintenant ?", p:5, op:'-', c:'sexe'},
+{n:87, t:"Avez-vous déjà eu des blessures à cause du sexe ?", p:5, op:'+', c:'sexe'},
+{n:88, t:"Avez-vous déjà téléphoné ou pris un appel pendant que vous faisiez l'amour ?", p:3, op:'+', c:'sexe'},
+{n:89, t:"Avez-vous déjà regardé la télé en faisant l'amour ?", p:3, op:'+', c:'sexe'},
+{n:90, t:"Avez-vous fait quelque chose pour améliorer votre score à ce test ?", p:10, op:'+', c:'divers'},
+];
+
+const TOTAL_Q = Q.length;
+
+const RESULTS = [
+  {max:19, title:"L'Immaculé(e)", comment:"Pour vous, les bonnes sœurs sont encore trop perverses. Vous êtes si pur(e) que le curé du village vous demande des conseils. On ne sait pas trop comment vous avez atterri sur ce test, mais on espère que ça ne vous a pas trop traumatisé(e). Vos parents doivent être fiers. Vraiment très fiers. Suspicieusement fiers.", share:"tes parents — ils seront ravis d'apprendre qu'ils ont réussi leur éducation"},
+  {max:39, title:"Le/La Novice", comment:"Arrêtez de survivre et essayez de vivre. Vous avez goûté à quelques petits plaisirs coupables, mais à peine assez pour en parler. Vous êtes le genre de personne qui met un gilet de sauvetage pour prendre un bain. Le monde ne mord pas — enfin, pas toujours — allez-y, trempez plus qu'un orteil.", share:"votre ex — pour lui montrer ce qu'il/elle a raté (pas grand-chose)"},
+  {max:59, title:"L'Apprenti(e)", comment:"Vous êtes presque normal(e), mais vous avez du mal à franchir le pas. Vous avez fait quelques bêtises, certes, mais toujours avec la ceinture de sécurité attachée et un plan de repli. Vous êtes le mélange intéressant de quelqu'un qui veut vivre mais qui a encore la voix de maman dans la tête.", share:"votre premier date Tinder — pour le rassurer"},
+  {max:99, title:"Le/La Citoyen(ne) Lambda", comment:"Tout à fait dans la norme. Vous avez fait les conneries classiques que tout le monde fait mais que personne n'admet au repas de famille. Ni saint(e), ni démon, vous êtes ce juste milieu confortable qui permet de juger les autres avec un aplomb magnifique tout en ayant un placard plein de squelettes modestes.", share:"vos collègues — ça alimentera les discussions à la machine à café"},
+  {max:149, title:"L'Expérimenté(e)", comment:"Juste au-dessus de la moyenne. Tout ce qu'on peut dire, c'est que vous êtes sorti(e) de chez vous quelques fois… et que ça se voit. Vous avez un CV de débauche honorable, le genre qui fait rougir vos amis sages mais qui reste amateur comparé aux vrais professionnels. Continuez, vous avez du potentiel.", share:"votre meilleur(e) ami(e) — pour comparer vos palmarès"},
+  {max:199, title:"Le/La Déchaîné(e)", comment:"Vous vivez votre vie à fond les bananes, sans peur du lendemain. Vos anecdotes font pâlir vos collègues, votre foie vous envoie des lettres recommandées, et votre ange gardien a posé sa démission il y a longtemps. Vous n'avez clairement pas lu le mode d'emploi de la vie, et c'est probablement mieux comme ça.", share:"votre femme/mari — et priez pour qu'il/elle ait le sens de l'humour"},
+  {max:299, title:"Le/La Dégénéré(e)", comment:"Ouais… On va essayer la camisole. Tout va bien, les messieurs en blanc s'occupent de tout. Votre niveau de dépravation force un certain respect — il faut du dévouement pour cocher autant de cases. Si la débauche était un sport olympique, vous seriez sur le podium. Vos mémoires seraient un bestseller… mais impubliables.", share:"personne — mais vraiment personne. Gardez ça pour vous."},
+  {max:9999, title:"La Bête", comment:"Plus proche de l'animal que de l'être humain. Si vous pouviez vous lécher certaines parties du corps, vous ne sortiriez plus de chez vous. Le terme « sans limites » a été inventé pour des gens comme vous. Les scientifiques aimeraient vous étudier, les prêtres aimeraient vous exorciser, et vos ex aimeraient vous oublier. Félicitations, vous avez gagné — mais personne ne sait exactement quoi.", share:"un prêtre exorciste — et même lui aura besoin de renforts"},
+];
+
+let currentIdx=0, score=0, playerName='Inconnu(e)';
+let cats={alcool:0,drogue:0,sexe:0,divers:0};
+const catMax={alcool:18,drogue:8,sexe:49,divers:15};
+let awaitingBonus=false;
+
+// Stars
+(function(){
+  const c=document.getElementById('stars');
+  for(let i=0;i<80;i++){
+    const s=document.createElement('div');s.className='star';
+    const sz=Math.random()*2+1;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${1+Math.random()*3}s;`;
+    c.appendChild(s);
+  }
+})();
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function startQuiz(){
+  var nameInput = document.getElementById('player-name').value.trim();
+  if(!nameInput){
+    document.getElementById('name-error').style.display = 'block';
+    document.getElementById('player-name').focus();
+    return;
+  }
+  playerName = nameInput.charAt(0).toUpperCase() + nameInput.slice(1).toLowerCase();
+  currentIdx = 0;
+  score = 0;
+  cats = {alcool:0, drogue:0, sexe:0, divers:0};
+  showPage('page-question');
+  showQuestion();
+}
+
+function showQuestion(){
+  if(currentIdx>=Q.length){showResults();return;}
+  const q=Q[currentIdx];
+  document.getElementById('q-number').textContent=`Question ${q.n} / ${TOTAL_Q}`;
+  document.getElementById('progress-fill').style.width=((currentIdx/Q.length)*100)+'%';
+
+  const catLabels={alcool:'🍺 Alcool',drogue:'🌿 Drogue',sexe:'💋 Sexe',divers:'🎲 Divers'};
+  document.getElementById('q-cat-badge').innerHTML=`<span class="q-category cat-${q.c}">${catLabels[q.c]}</span>`;
+  document.getElementById('q-text').textContent=q.t;
+  document.getElementById('q-bonus-area').innerHTML='';
+  document.getElementById('number-input-box').style.display='none';
+  document.getElementById('q-buttons').style.display='flex';
+  document.getElementById('q-buttons').style.justifyContent='center';
+  awaitingBonus=false;
+}
+
+function answer(yes){
+  const q=Q[currentIdx];
+
+  if(awaitingBonus){
+    if(yes){
+      const b=q._activeBonus;
+      if(b){if(b.op==='+')score+=b.p;else score-=b.p;}
+    }
+    awaitingBonus=false;
+    currentIdx++;
+    showQuestion();
+    return;
+  }
+
+  if(yes){
+    if(q.op==='+')score+=q.p;else score-=q.p;
+    cats[q.c]++;
+
+    if(q.numInput){showNumberInput(q);return;}
+    if(q.bonus){showBonusQuestion(q,q.bonus);return;}
+  }
+
+  currentIdx++;
+  showQuestion();
+}
+
+function showBonusQuestion(q,bonus){
+  awaitingBonus=true;
+  q._activeBonus=bonus;
+  document.getElementById('q-bonus-area').innerHTML=`<div class="q-bonus">↳ ${bonus.t}</div>`;
+}
+
+function showNumberInput(q){
+  const box=document.getElementById('number-input-box');
+  const btns=document.getElementById('number-btns');
+  document.getElementById('number-label').textContent=q.numInput.label;
+  btns.innerHTML='';
+
+  for(let i=0;i<=q.numInput.max;i++){
+    const b=document.createElement('button');
+    b.className='btn';b.textContent=i;
+    b.onclick=()=>{
+      score+=i*q.numInput.mult;
+      box.style.display='none';
+      document.getElementById('q-buttons').style.display='flex';
+      if(q.bonus){showBonusQuestion(q,q.bonus);}
+      else{currentIdx++;showQuestion();}
+    };
+    btns.appendChild(b);
+  }
+
+  document.getElementById('q-buttons').style.display='none';
+  box.style.display='block';
+}
+
+function saveResultToSheet(finalScore, categoryTitle) {
+  var endpoint = 'https://script.google.com/macros/s/AKfycbz_210bidqml_UIrFdtc_L5L0v85BTD2Iw0KzWQGclrUfUAZtM1N3lGWilREV6KhqeCmw/exec';
+  var payload = {
+    name: playerName,
+    score: finalScore,
+    alcool: cats.alcool,
+    drogue: cats.drogue,
+    sexe: cats.sexe,
+    divers: cats.divers,
+    category: categoryTitle
+  };
+  // fire-and-forget, no-cors so it doesn't block or fail visibly
+  try {
+    fetch(endpoint, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    }).catch(function(){});
+  } catch(e) { /* silently ignore */ }
+}
+
+function showResults(){
+  showPage('page-results');
+
+  const finalScore=Math.max(0,score);
+  const scoreEl=document.getElementById('score-value');
+  let displayed=0;
+  const step=Math.max(1,Math.floor(finalScore/40));
+  const iv=setInterval(()=>{
+    displayed=Math.min(displayed+step,finalScore);
+    scoreEl.textContent=displayed;
+    if(displayed>=finalScore){clearInterval(iv);scoreEl.textContent=finalScore;}
+  },30);
+
+  document.getElementById('score-label').textContent=`${playerName}, votre score au Test de Pureté`;
+
+  let r=RESULTS[RESULTS.length-1];
+  for(const res of RESULTS){if(finalScore<=res.max){r=res;break;}}
+
+  document.getElementById('score-title').textContent=`« ${playerName} — ${r.title} »`;
+  document.getElementById('score-comment').textContent=r.comment;
+
+  setTimeout(()=>{
+    setBar('bar-alcool',cats.alcool,catMax.alcool);
+    setBar('bar-drogue',cats.drogue,catMax.drogue);
+    setBar('bar-sexe',cats.sexe,catMax.sexe);
+    setBar('bar-divers',cats.divers,catMax.divers);
+  },300);
+
+  document.getElementById('screenshot-tip').innerHTML=
+    `<span class="emoji">📸</span>
+    <div class="tip-text">Fais une capture d'écran de cette page et envoie-la à…</div>
+    <div class="tip-target">${r.share}</div>`;
+
+  // Save to Google Sheet (silent, transparent)
+  saveResultToSheet(finalScore, r.title);
+}
+
+function setBar(id,val,max){
+  const pct=Math.round((val/max)*100);
+  const el=document.getElementById(id);
+  el.style.width=pct+'%';
+  el.textContent=val+'/'+max;
+}
+</script>
+</body>
+</html>
