@@ -439,11 +439,6 @@ body {
 </div>
 
 <script>
-// Global error handler - shows alert on iOS if JS breaks
-window.onerror = function(msg, url, line) {
-  alert('JS Erreur ligne ' + line + ': ' + msg);
-  return false;
-};
 const Q = [
 {n:1, t:"Avez-vous déjà ri du malheur de quelqu'un ?", p:1, op:'+', c:'divers'},
 {n:2, t:"Avez-vous déjà ri d'une personne mentalement ou physiquement handicapée ?", p:2, op:'+', c:'divers'},
@@ -586,22 +581,18 @@ function showPage(id){
 }
 
 function startQuiz(){
-  try {
-    var nameInput = document.getElementById('player-name').value.trim();
-    if(!nameInput){
-      document.getElementById('name-error').style.display = 'block';
-      document.getElementById('player-name').focus();
-      return;
-    }
-    playerName = nameInput.charAt(0).toUpperCase() + nameInput.slice(1).toLowerCase();
-    currentIdx = 0;
-    score = 0;
-    cats = {alcool:0, drogue:0, sexe:0, divers:0};
-    showPage('page-question');
-    showQuestion();
-  } catch(e) {
-    alert('Erreur: ' + e.message);
+  var nameInput = document.getElementById('player-name').value.trim();
+  if(!nameInput){
+    document.getElementById('name-error').style.display = 'block';
+    document.getElementById('player-name').focus();
+    return;
   }
+  playerName = nameInput.charAt(0).toUpperCase() + nameInput.slice(1).toLowerCase();
+  currentIdx = 0;
+  score = 0;
+  cats = {alcool:0, drogue:0, sexe:0, divers:0};
+  showPage('page-question');
+  showQuestion();
 }
 
 function showQuestion(){
@@ -675,6 +666,28 @@ function showNumberInput(q){
   box.style.display='block';
 }
 
+function saveResultToSheet(finalScore, categoryTitle) {
+  var endpoint = 'https://script.google.com/macros/s/AKfycbz_210bidqml_UIrFdtc_L5L0v85BTD2Iw0KzWQGclrUfUAZtM1N3lGWilREV6KhqeCmw/exec';
+  var payload = {
+    name: playerName,
+    score: finalScore,
+    alcool: cats.alcool,
+    drogue: cats.drogue,
+    sexe: cats.sexe,
+    divers: cats.divers,
+    category: categoryTitle
+  };
+  // fire-and-forget, no-cors so it doesn't block or fail visibly
+  try {
+    fetch(endpoint, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    }).catch(function(){});
+  } catch(e) { /* silently ignore */ }
+}
+
 function showResults(){
   showPage('page-results');
 
@@ -707,6 +720,9 @@ function showResults(){
     `<span class="emoji">📸</span>
     <div class="tip-text">Fais une capture d'écran de cette page et envoie-la à…</div>
     <div class="tip-target">${r.share}</div>`;
+
+  // Save to Google Sheet (silent, transparent)
+  saveResultToSheet(finalScore, r.title);
 }
 
 function setBar(id,val,max){
